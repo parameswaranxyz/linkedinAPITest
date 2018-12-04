@@ -22,7 +22,7 @@ app.get('/oauth/linkedin', function(req, res) {
 app.get('/oauth/linkedin/callback', function(req, res) {
     Linkedin.auth.getAccessToken(res, req.query.code, req.query.state, function(err, results) {
         if ( err )
-            return console.error(err);
+            return console.error('eror',err);
  
         /**
          * Results have something like:
@@ -31,7 +31,7 @@ app.get('/oauth/linkedin/callback', function(req, res) {
  
         linkedin = Linkedin.init(results.acess_token);
          
-        return res.redirect('/facebook');
+        // return res.redirect('/facebook');
     });
 });
 
