@@ -7,7 +7,7 @@ const scope = ['r_basicprofile', 'r_emailaddress', 'rw_company_admin'];
 const redirectUrl = 'https://mxians-tracking.herokuapp.com/';
 const Linkedin = require('node-linkedin')(api_key, 'EMhuyarIxKs22kSu');
 
-var linkedin = Linkedin.init('my_access_token');
+var linkedin;
 
 app.get('/', function(req, res) {  
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -17,19 +17,37 @@ app.get('/oauth/linkedin', function(req, res) {
     // This will ask for permisssions etc and redirect to callback url.
     Linkedin.auth.setCallback(redirectUrl);
     Linkedin.auth.authorize(res, scope);
+
 });
 
-// app.get('/oauth/linkedin', function(req, res) {
-//     // This will ask for permisssions etc and redirect to callback url.
-//     Linkedin.auth.authorize(res, scope);
-//     linkedin.companies_search.name('facebook', 1, function(err, company) {
-//         name = company.companies.values[0].name;
-//         desc = company.companies.values[0].description;
-//         industry = company.companies.values[0].industries.values[0].name;
-//         city = company.companies.values[0].locations.values[0].address.city;
-//         websiteUrl = company.companies.values[0].websiteUrl;
-//     });    
-// });
+app.get('/oauth/linkedin/callback', function(req, res) {
+    Linkedin.auth.getAccessToken(res, req.query.code, req.query.state, function(err, results) {
+        if ( err )
+            return console.error(err);
+ 
+        /**
+         * Results have something like:
+         * {"expires_in":5184000,"access_token":". . . ."}
+         */
+ 
+        linkedin = Linkedin.init(results.acess_token);
+         
+        return res.redirect('/facebook');
+    });
+});
+
+app.get('/facebook', function(req, res) {
+    // This will ask for permisssions etc and redirect to callback url.            
+    linkedin.companies_search.name('facebook', 1, function(err, company) {
+        name = company.companies.values[0].name;
+        desc = company.companies.values[0].description;
+        industry = company.companies.values[0].industries.values[0].name;
+        city = company.companies.values[0].locations.values[0].address.city;
+        websiteUrl = company.companies.values[0].websiteUrl;
+
+        res.send('<p>name',name,'desc',desc,'</p>');
+    });    
+});
 
 app.listen(process.env.PORT || 4000, function(){
     console.log('Your node js server is running');
