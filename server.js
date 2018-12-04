@@ -4,6 +4,7 @@ const path = require('path');
 
 const api_key ='81u14o7fg3jp7g';
 const scope = ['r_basicprofile', 'r_emailaddress', 'rw_company_admin'];
+const redirectUrl = 'https://mxians-tracking.herokuapp.com/';
 const Linkedin = require('node-linkedin')(api_key, 'EMhuyarIxKs22kSu');
 
 var linkedin = Linkedin.init('my_access_token');
@@ -14,6 +15,7 @@ app.get('/', function(req, res) {
 
 app.get('/oauth/linkedin', function(req, res) {
     // This will ask for permisssions etc and redirect to callback url.
+    Linkedin.auth.setCallback(redirectUrl);
     Linkedin.auth.authorize(res, scope);
 });
 
