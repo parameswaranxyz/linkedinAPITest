@@ -67,9 +67,8 @@ let url = 'https://www.linkedin.com/oauth/v2/authorization?response_type=code&cl
   .then(function(data) {
         console.log(data);
 
-    })
-  })
-  .catch(function(error) {
+    })  
+    .catch(function(error) {
     // If there is any error you will catch them here
   });   
 
@@ -99,52 +98,19 @@ app.get('/oauth/linkedin/callback', function(req, res) {
     });
 });
 
-app.get('/facebook', function(req, res) {
-    // This will ask for permisssions etc and redirect to callback url.            
-    linkedin.companies_search.name('facebook', 1, function(err, company) {
-        name = company.companies.values[0].name;
-        desc = company.companies.values[0].description;
-        industry = company.companies.values[0].industries.values[0].name;
-        city = company.companies.values[0].locations.values[0].address.city;
-        websiteUrl = company.companies.values[0].websiteUrl;
+// app.get('/facebook', function(req, res) {
+//     // This will ask for permisssions etc and redirect to callback url.            
+//     linkedin.companies_search.name('facebook', 1, function(err, company) {
+//         name = company.companies.values[0].name;
+//         desc = company.companies.values[0].description;
+//         industry = company.companies.values[0].industries.values[0].name;
+//         city = company.companies.values[0].locations.values[0].address.city;
+//         websiteUrl = company.companies.values[0].websiteUrl;
 
-        res.send('<p>name',name,'desc',desc,'</p>');
-    });    
-});
+//         res.send('<p>name',name,'desc',desc,'</p>');
+//     });    
+// });
 
 app.listen(process.env.PORT || 4000, function(){
     console.log('Your node js server is running');
 });
-
-
-
-// var key = ''
-//   , secret = ''
-//   , callbackUrl = ''
-//   , LinkedIn = require('../')
-//   , rl = require('readline')
-//   , linkedIn = new LinkedIn(key, secret)
-//   , qs = require('querystring')
-//   , util = require('util');
-
-// linkedIn.OAuth2.getAuthorizeUrl(callbackUrl, function(err, url) {
-//   console.log('Follow the url to get code: \n' + url)
-// });
-// var i = rl.createInterface(process.stdin, process.stdout);
-
-// i.question("Enter oauth_verifier: ", function(code) {
-//   i.close();
-//   process.stdin.destroy();
-//   console.log(callbackUrl);
-//   linkedIn.OAuth2.getAccessToken(code, callbackUrl, function(error, accessToken, accessTokenSecret) {
-//     if(error) console.log(error);    
-//     var params = {};
-
-//     params.access_token = accessToken;
-
-//     linkedIn.OAuth2.accessToken = accessToken;
-//     linkedIn.OAuth2.accessTokenSecret = accessTokenSecret;
-//     // v1/people/~/connections
-        
-//   })
-// });
