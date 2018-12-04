@@ -4,7 +4,7 @@ const path = require('path');
 
 const api_key ='81u14o7fg3jp7g';
 const scope = ['r_basicprofile', 'r_emailaddress', 'rw_company_admin'];
-const redirectUrl = 'https://mxians-tracking.herokuapp.com/';
+const redirectUrl = 'https://mxians-tracking.herokuapp.com/oauth/linkedin/callback';
 const Linkedin = require('node-linkedin')(api_key, 'EMhuyarIxKs22kSu');
 
 var linkedin;
