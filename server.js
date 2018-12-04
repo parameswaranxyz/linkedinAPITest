@@ -9,14 +9,78 @@ const Linkedin = require('node-linkedin')(api_key, 'EMhuyarIxKs22kSu');
 
 var linkedin;
 
+function handshake(code, ores) {
+
+    //set all required post parameters
+    var data = querystring.stringify({
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: OauthParams.redirect_uri,//should match as in Linkedin application setup
+        client_id: OauthParams.client_id,
+        client_secret: OauthParams.client_secret// the secret
+    });
+    
+    var options = {
+        host: 'www.linkedin.com',
+        path: '/oauth/v2/accessToken',
+        protocol: 'https:',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+    
+    var req = http.request(options, function (res) {
+         var data = '';
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            data += chunk;
+        });
+        res.on('end', function () {
+            //once the access token is received store in DB
+            console.log(res);
+        });
+        req.on('error', function (e) {
+            console.log("problem with request: " + e.message);
+        });
+
+    });
+    req.write(data);
+    req.end();
+
+}
+
+
 app.get('/', function(req, res) {  
-    res.sendFile(path.join(__dirname, 'index.html'));
+    var error = req.query.error;   
+    if (error) {
+        next(new Error(error));
+    }    
+    handshake(req.query.code, res);
 });
 
 app.get('/oauth/linkedin', function(req, res) {
+
+let url = 'https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=81u14o7fg3jp7g&redirect_uri=https://mxians-tracking.herokuapp.com';
+ fetch(url)
+  .then(function(data) {
+        console.log(data);
+
+    })
+  })
+  .catch(function(error) {
+    // If there is any error you will catch them here
+  });   
+
     // This will ask for permisssions etc and redirect to callback url.
-    Linkedin.auth.setCallback(redirectUrl);
-    Linkedin.auth.authorize(res, scope);    
+
+    
+    // https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=81u14o7fg3jp7g&redirect_uri=
+
+
+    // Linkedin.auth.setCallback(redirectUrl);
+    // Linkedin.auth.authorize(res, scope);    
 });
 
 app.get('/oauth/linkedin/callback', function(req, res) {
