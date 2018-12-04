@@ -1,69 +1,25 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const fetch = require('node-fetch');
 
 const api_key ='81u14o7fg3jp7g';
 const scope = ['r_basicprofile', 'r_emailaddress', 'rw_company_admin'];
 const redirectUrl = 'https://mxians-tracking.herokuapp.com';
 const Linkedin = require('node-linkedin')(api_key, 'EMhuyarIxKs22kSu');
-
+var querystring = require('querystring');
+var https = require('https');
 var linkedin;
 
-function handshake(code, ores) {
-
-    //set all required post parameters
-    var data = querystring.stringify({
-        grant_type: "authorization_code",
-        code: code,
-        redirect_uri: OauthParams.redirect_uri,//should match as in Linkedin application setup
-        client_id: OauthParams.client_id,
-        client_secret: OauthParams.client_secret// the secret
-    });
-    
-    var options = {
-        host: 'www.linkedin.com',
-        path: '/oauth/v2/accessToken',
-        protocol: 'https:',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(data)
-        }
-    };
-    
-    var req = http.request(options, function (res) {
-         var data = '';
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            data += chunk;
-        });
-        res.on('end', function () {
-            //once the access token is received store in DB
-            console.log(res);
-        });
-        req.on('error', function (e) {
-            console.log("problem with request: " + e.message);
-        });
-
-    });
-    req.write(data);
-    req.end();
-
-}
-
-
-app.get('/', function(req, res) {  
-    var error = req.query.error;   
-    if (error) {
-        next(new Error(error));
-    }    
+app.get('/', function(req, res) {          
     handshake(req.query.code, res);
 });
 
 app.get('/oauth/linkedin', function(req, res) {
 
-let url = 'https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=81u14o7fg3jp7g&redirect_uri=https://mxians-tracking.herokuapp.com';
- fetch(url)
+let url= 'https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=81u14o7fg3jp7g&redirect_uri=http://localhost:3005';
+ 
+  fetch(url)
   .then(function(data) {
         console.log(data);
 
@@ -111,6 +67,49 @@ app.get('/oauth/linkedin/callback', function(req, res) {
 //     });    
 // });
 
-app.listen(process.env.PORT || 4000, function(){
+app.listen(process.env.PORT || 3005, function(){
     console.log('Your node js server is running');
 });
+
+
+function handshake(code, ores) {
+
+    //set all required post parameters
+    var data = querystring.stringify({
+        grant_type: "authorization_code",
+        code: code,
+        redirect_uri: 'http://localhost:3005', //should match as in Linkedin application setup
+        client_id: api_key,
+        client_secret: 'EMhuyarIxKs22kSu'
+    });
+    
+    var options = {
+        host: 'www.linkedin.com',
+        path: '/oauth/v2/accessToken',
+        protocol: 'https:',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+    
+    var req = https.request(options, function (res) {
+         var data = '';
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            data += chunk;
+        });
+        res.on('end', function () {
+            //once the access token is received store in DB
+            console.log("Access token: ", data);
+        });
+        req.on('error', function (e) {
+            console.log("problem with request: " + e.message);
+        });
+
+    });
+    req.write(data);
+    req.end();
+
+}
